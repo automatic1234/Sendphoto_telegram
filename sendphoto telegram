@@ -1,0 +1,46 @@
+private void sendPhotoToTelegram(Bitmap bitmap) {
+
+    String botToken = "<YOUR_BOT_TOKEN>";
+    String chatId = "<YOUR_CHAT_ID>";
+
+    ByteArrayOutputStream stream = new ByteArrayOutputStream();
+    bitmap.compress(Bitmap.CompressFormat.JPEG, 100, stream);
+    byte[] imageBytes = stream.toByteArray();
+
+    String url = "https://api.telegram.org/bot" + botToken + "/sendPhoto";
+
+    VolleyMultipartRequest request = new VolleyMultipartRequest(
+            Request.Method.POST,
+            url,
+
+            response -> Log.d("Telegram", "Photo Sent"),
+
+            error -> Log.e("Telegram", error.toString())
+
+    ) {
+
+        @Override
+        protected Map<String, String> getParams() {
+
+            Map<String, String> params = new HashMap<>();
+            params.put("chat_id", chatId);
+            params.put("caption", "Android Image");
+
+            return params;
+        }
+
+        @Override
+        protected Map<String, DataPart> getByteData() {
+
+            Map<String, DataPart> params = new HashMap<>();
+
+            params.put("photo",
+                    new DataPart("photo.jpg", imageBytes, "image/jpeg"));
+
+            return params;
+        }
+
+    };
+
+    Volley.newRequestQueue(getApplicationContext()).add(request);
+}
